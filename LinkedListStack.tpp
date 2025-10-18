@@ -1,6 +1,7 @@
 template <typename T>
-LinkedListStack<T>::LinkedListStack()
-{ }
+LinkedListStack<T>::LinkedListStack() {
+    top = nullptr;
+}
 
 template <typename T>
 LinkedListStack<T>::LinkedListStack(const LinkedListStack<T>& copyObj) {
@@ -23,12 +24,29 @@ LinkedListStack<T>::~LinkedListStack() {
 
 template <typename T>
 void LinkedListStack<T>::clear() {
-    // TO DO: Delete all the elements in the stack
+    while(top != nullptr) {
+        Node<T> * old = top;
+        top = top->next;
+        delete old;
+    }
+    this->length = 0;
 }
 
 template <typename T>
 void LinkedListStack<T>::copy(const LinkedListStack<T>& copyObj) {
-    // TO DO: Implement copy 
+    clear();
+    this->length = copyObj.length;
+    if (this->length > 0) {
+        top = new Node<T>(copyObj.top->value);
+        Node<T> * currA = top;
+        Node<T> * currB = copyObj.top;
+        while(currB->next != nullptr) {
+            currA->next = new Node<T>(currB->next->value);
+            currB = currB->next;
+            currA = currA->next;
+        }
+    }
+
     
 }
 
@@ -45,22 +63,60 @@ bool LinkedListStack<T>::isEmpty() const {
 
 template <typename T>
 T LinkedListStack<T>::peek() const {
-    // TO DO: implement peek
+    if (this->length == 0) {
+        throw string("peek: error, no elements");
+    } 
+    return top->data;
 }
 
 template <typename T>
 void LinkedListStack<T>::pop() {
-    // TO DO: Implement pop
+    if (this->length == 0) {
+        throw string("pop: error, no elements");
+    }
+    Node<T> * old = top;
+    top = top->next;
+    delete old;
+    this->length--;
 }
 
 template <typename T>
 void LinkedListStack<T>::push(const T& elem) {
-    // TO DO: Implement push
+    Node<T> * newNode = new Node<T>(elem);
+    newNode->next = top;
+    top = newNode;
+    this->length++;
 }
 
 template <typename T>
 void LinkedListStack<T>::rotate(typename Stack<T>::Direction dir) {
-    // TO DO: Implement rotate
+    if (this->length <= 1) {
+        return;
+    }
+    if (dir == Stack<T>::LEFT) {
+        Node<T> * prev = top;
+        Node<T> * last = top->next;
+        while(last->next != nullptr) {
+            prev = last;
+            last = last->next;
+        }
+        prev->next = nullptr;
+        last->next = top;
+        top = last;
+        
+    } else if (dir == Stack<T>::RIGHT) {
+        Node<T> * last = top;
+        while(last->next != nullptr) {
+            last = last->next;
+        }
+        Node<T> * newTop = top->next;
+        last->next = top;
+        top->next = nullptr;
+        top = newTop;
+
+    } else {
+        throw string("rotate: unknown direction");
+    }
 }
 
 template <typename T>
